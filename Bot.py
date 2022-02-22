@@ -42,6 +42,10 @@ class MinerBot():
         self.logger.info('Executing...')
         loop = asyncio.get_event_loop()
         web3 = self.web3  
+
+        gasp = requests.get(self.gas_api).json()['result']['SafeGasPrice']
+        if gasp > '50':
+            return
           
         if self.hash:
             try:
@@ -50,16 +54,12 @@ class MinerBot():
                 self.logger.info(f'Error: {E}')
                 return
 
-        gasp = int(requests.get(self.gas_api).json()['result']['SafeGasPrice'])
-        if gasp > 50:
-            return
-
         account = self.account
         mminer = self.miner
 
         balance = loop.run_in_executor(None, web3.eth.getBalance, account.address)
         nonce = loop.run_in_executor(None, web3.eth.getTransactionCount, account.address)
-        gasPrice = loop.run_in_executor(None, web3.toWei, '30', 'gwei')
+        gasPrice = web3.toWei('30', 'gwei')
         eggs = loop.run_in_executor(None, mminer.functions.getMyEggs().call, {'from': account.address})
 
         balance = await balance
@@ -69,7 +69,7 @@ class MinerBot():
 
         maticBal = await maticBal
         nonce = await nonce
-        gasPrice = await gasPrice
+        # gasPrice = await gasPrice
         mined_matic = await mined_matic
         mined_matic_1 = web3.fromWei(mined_matic, "ether")
 
