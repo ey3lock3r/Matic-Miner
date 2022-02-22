@@ -1,4 +1,6 @@
-.direnv/
 __pycache__/
+.direnv/
 .env
 .envrc
+.vscode/
+bot_log.log
