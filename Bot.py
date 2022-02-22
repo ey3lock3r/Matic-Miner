@@ -45,12 +45,10 @@ class MinerBot():
         account = self.account
         mminer = self.miner
 
-        pendNonce = loop.run_in_executor(None, web3.eth.getTransactionCount, account.address, 'pending')
-        nonce = loop.run_in_executor(None, web3.eth.getTransactionCount, account.address)
-        pendNonce = await pendNonce
-        nonce = await nonce
+        pendNonce = web3.eth.getTransactionCount(account.address, 'pending')
+        nonce = web3.eth.getTransactionCount(account.address)
         if pendNonce > nonce:
-            self.logger.info('There are pending transactions ...')
+            self.logger.info(f'There are pending transactions [{pendNonce}, {nonce}] ...')
             return
 
         gasp = requests.get(self.gas_api).json()['result']['SafeGasPrice']
