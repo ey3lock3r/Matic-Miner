@@ -54,13 +54,6 @@ class MinerBot():
         gasp = requests.get(self.gas_api).json()['result']['SafeGasPrice']
         if gasp > '50':
             return
-          
-        if self.hash:
-            try:
-                web3.eth.get_transaction_receipt(self.hash)    # If transaction still pending throws an error
-            except Exception as E:
-                self.logger.info(f'Error: {E}')
-                return
 
         balance = loop.run_in_executor(None, web3.eth.getBalance, account.address)
         gasPrice = loop.run_in_executor(None, web3.toWei, '30', 'gwei')
