@@ -14,6 +14,7 @@ class MinerBot():
         self.miner_cont = miner_cont
         self.pkey = pkey
         self.interval = interval
+        self.wait_count = 0
         
         self.transaction = transaction
         self.hash = None
@@ -36,6 +37,7 @@ class MinerBot():
         # send the transaction
         self.hash = self.web3.eth.send_raw_transaction(signed_tx.rawTransaction)
         self.logger.info(f'Tx Hash: {self.hash.hex()}')
+        self.wait_count = 0
 
     async def execute_trans(self):
         self.logger.info('>'*70)
@@ -47,16 +49,21 @@ class MinerBot():
 
         pendNonce = web3.eth.getTransactionCount(account.address, 'pending')
         nonce = web3.eth.getTransactionCount(account.address)
-        if pendNonce > nonce:
-            self.logger.info(f'There are pending transactions [{pendNonce}, {nonce}] ...')
-            return
-
         gasp = requests.get(self.gas_api).json()['result']['SafeGasPrice']
+
         if gasp > '50':
             return
 
+        if pendNonce > nonce and self.wait_count < 3:
+            self.logger.info(f'There are pending transactions [{pendNonce}, {nonce}] ... waited {self.wait_count}x!')
+            self.wait_count += 1
+            return
+        
+        if self.wait_count == 0:
+            gasp = '30'
+
         balance = loop.run_in_executor(None, web3.eth.getBalance, account.address)
-        gasPrice = loop.run_in_executor(None, web3.toWei, '30', 'gwei')
+        gasPrice = loop.run_in_executor(None, web3.toWei, gasp, 'gwei')
         eggs = loop.run_in_executor(None, mminer.functions.getMyEggs().call, {'from': account.address})
 
         balance = await balance
