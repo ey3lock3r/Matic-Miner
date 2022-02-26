@@ -61,7 +61,9 @@ class MinerBot():
         
         if self.wait_count == 0:
             gasp = '30'
-
+        else:
+            gasp = '35'
+        
         balance = loop.run_in_executor(None, web3.eth.getBalance, account.address)
         gasPrice = loop.run_in_executor(None, web3.toWei, gasp, 'gwei')
         eggs = loop.run_in_executor(None, mminer.functions.getMyEggs().call, {'from': account.address})
