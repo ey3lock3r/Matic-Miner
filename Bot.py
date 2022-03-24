@@ -8,10 +8,7 @@ from web3.middleware import geth_poa_middleware
 
 class MinerBot():
     def __init__(self, rpc, gas_api, miner_abi, miner_cont, transaction, pkey, polyscan_token, interval, logger=None):
-        self.rpc = rpc
         self.gas_api = gas_api + polyscan_token
-        self.miner_abi = miner_abi
-        self.miner_cont = miner_cont
         self.pkey = pkey
         self.interval = interval
         self.wait_count = 0
@@ -26,7 +23,7 @@ class MinerBot():
         web3 = Web3(Web3.HTTPProvider(rpc))
         web3.middleware_onion.inject(geth_poa_middleware, layer=0)
         self.account = web3.eth.account.privateKeyToAccount(pkey)
-        self.miner = web3.eth.contract(address=Web3.toChecksumAddress(self.miner_cont), abi=self.miner_abi)
+        self.miner = web3.eth.contract(address=Web3.toChecksumAddress(miner_cont), abi=miner_abi)
         self.web3 = web3
 
         self.logger.info('Miner Bot initialized!')
