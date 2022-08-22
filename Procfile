@@ -1,1 +1,1 @@
-web: python3 app.py
+run_matic: python3 app.py
