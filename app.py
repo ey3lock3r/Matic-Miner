@@ -1,3 +1,7 @@
+# Loading an Environment Variable File with dotenv
+from dotenv import load_dotenv
+load_dotenv()
+
 from Bot import MinerBot
 import os
 import yaml
