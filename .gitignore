@@ -3,4 +3,5 @@ __pycache__/
 .env
 .envrc
 .vscode/
+.DS_Store
 bot_log.log
