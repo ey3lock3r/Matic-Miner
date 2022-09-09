@@ -153,5 +153,3 @@ class MinerBot():
         finally:
             loop.close()
             self.logger.info('Program finished')
-
-
