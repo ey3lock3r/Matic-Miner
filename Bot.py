@@ -12,7 +12,8 @@ class MinerBot():
         self.pkey = pkey
         self.interval = interval
         self.wait_count = 0
-        
+        self.gasprice = 0
+
         self.transaction = transaction
         self.hash = None
 
@@ -44,22 +45,22 @@ class MinerBot():
         account = self.account
         mminer = self.miner
 
-        pendNonce = web3.eth.getTransactionCount(account.address, 'pending')
-        nonce = web3.eth.getTransactionCount(account.address)
-        gasp = requests.get(self.gas_api).json()['result']['SafeGasPrice']
-
-        if gasp > '50':
-            return
-
         if pendNonce > nonce and self.wait_count < 3:
             self.logger.info(f'There are pending transactions [{pendNonce}, {nonce}] ... waited {self.wait_count}x!')
             self.wait_count += 1
             return
+
+        pendNonce = web3.eth.getTransactionCount(account.address, 'pending')
+        nonce = web3.eth.getTransactionCount(account.address)
+        gasp = requests.get(self.gas_api).json()['result']['SafeGasPrice']
+
+        if gasp > '90':
+            return
         
         if self.wait_count == 0:
-            gasp = '30'
+            self.gasprice = gasp
         else:
-            gasp = '35'
+            gasp = self.gasprice
         
         balance = loop.run_in_executor(None, web3.eth.getBalance, account.address)
         gasPrice = loop.run_in_executor(None, web3.toWei, gasp, 'gwei')
