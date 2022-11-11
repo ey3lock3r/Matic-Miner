@@ -49,6 +49,7 @@ class MinerBot():
         pendNonce = web3.eth.getTransactionCount(account.address, 'pending')
         nonce = web3.eth.getTransactionCount(account.address)
         gasp = requests.get(self.gas_api).json()['result']['SafeGasPrice']
+        self.logger.info(f'gasp: {gasp}')
 
         if pendNonce > nonce and self.wait_count < 3:
             self.logger.info(f'There are pending transactions [{pendNonce}, {nonce}] ... waited {self.wait_count}x!')
@@ -59,9 +60,9 @@ class MinerBot():
             return
         
         if self.wait_count == 0:
-            self.gasprice = gasp
+            self.gasp = gasp
         else:
-            gasp = self.gasprice
+            gasp = self.gasp
         
         balance = loop.run_in_executor(None, web3.eth.getBalance, account.address)
         gasPrice = loop.run_in_executor(None, web3.toWei, gasp, 'gwei')
@@ -98,6 +99,7 @@ class MinerBot():
 
             if mined_matic - gasFee > gasFee:
                 gasFee_1 = web3.fromWei(gasFee, "ether")
+                self.logger.info(f'Est Gas: {estGas}')
                 self.logger.info(f'Gas Fee: {gasFee_1}')
                 self.logger.info('Autocompounding...')
                 # build the transaction
