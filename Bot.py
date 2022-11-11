@@ -44,6 +44,7 @@ class MinerBot():
         web3 = self.web3  
         account = self.account
         mminer = self.miner
+        gasp = '35'
 
         pendNonce = web3.eth.getTransactionCount(account.address, 'pending')
         nonce = web3.eth.getTransactionCount(account.address)
