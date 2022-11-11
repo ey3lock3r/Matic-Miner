@@ -37,7 +37,7 @@ class MinerBot():
             # send the transaction
             self.hash = self.web3.eth.send_raw_transaction(signed_tx.rawTransaction)
         except Exception as E:
-            exc_type, exc_value, exc_traceback = sys.exc_info()
+            ex_type, ex_value, ex_traceback = sys.exc_info()
 
             # Extract unformatter stack traces as tuples
             trace_back = traceback.extract_tb(ex_traceback)
