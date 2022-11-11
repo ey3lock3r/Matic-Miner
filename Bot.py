@@ -53,7 +53,7 @@ class MinerBot():
             self.logger.info(f'Exception message : {ex_value}')
             self.logger.info(f'Stack trace : {stack_trace}')
 
-            self.gasp += 5
+            # self.gasp += 5
 
         else:
             self.logger.info(f'Tx Hash: {self.hash.hex()}')
@@ -167,6 +167,7 @@ class MinerBot():
             except Exception as E:
                 self.logger.info(f'Error: {E}')
                 self.logger.debug(traceback.print_exc())
+                self.gasp += 5
 
     def run(self):
         """Wrapper for start to run without additional libraries for managing asynchronous"""
