@@ -79,8 +79,9 @@ class MinerBot():
             self.wait_count += 1
             return
 
-        # if gasp > '90':
-        #     return
+        if gasp > '90':
+            self.gasp = 35
+            return
         
         # if self.wait_count == 0:
         #     self.gasp = gasp
