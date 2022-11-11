@@ -3,6 +3,7 @@ import logging
 import requests
 import time
 import traceback
+import sys
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
 
@@ -12,7 +13,7 @@ class MinerBot():
         self.pkey = pkey
         self.interval = interval
         self.wait_count = 0
-        self.gasprice = 0
+        self.gasp = 35
 
         self.transaction = transaction
         self.hash = None
@@ -30,12 +31,34 @@ class MinerBot():
         self.logger.info('Miner Bot initialized!')
 
     def send_transaction(self, tx):
-        # sign the transaction
-        signed_tx = self.web3.eth.account.sign_transaction(tx, self.pkey)
-        # send the transaction
-        self.hash = self.web3.eth.send_raw_transaction(signed_tx.rawTransaction)
-        self.logger.info(f'Tx Hash: {self.hash.hex()}')
-        self.wait_count = 0
+        try:
+            # sign the transaction
+            signed_tx = self.web3.eth.account.sign_transaction(tx, self.pkey)
+            # send the transaction
+            self.hash = self.web3.eth.send_raw_transaction(signed_tx.rawTransaction)
+        except Exception as E:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+
+            # Extract unformatter stack traces as tuples
+            trace_back = traceback.extract_tb(ex_traceback)
+
+            # Format stacktrace
+            stack_trace = list()
+
+            for trace in trace_back:
+                stack_trace.append("File : %s , Line : %d, Func.Name : %s, Message : %s" % (trace[0], trace[1], trace[2], trace[3]))
+        
+            # if exc_value == '':
+            self.logger.info(f'Exception type : {ex_type.__name__}')
+            self.logger.info(f'Exception message : {ex_value}')
+            self.logger.info(f'Stack trace : {stack_trace}')
+
+            self.gasp += 5
+
+        else:
+            self.logger.info(f'Tx Hash: {self.hash.hex()}')
+            self.wait_count = 0
+            self.gasp = 35
 
     async def execute_trans(self):
         self.logger.info('>'*70)
@@ -44,25 +67,25 @@ class MinerBot():
         web3 = self.web3  
         account = self.account
         mminer = self.miner
-        gasp = '35'
+        gasp = str(self.gasp)
 
         pendNonce = web3.eth.getTransactionCount(account.address, 'pending')
         nonce = web3.eth.getTransactionCount(account.address)
-        gasp = requests.get(self.gas_api).json()['result']['SafeGasPrice']
-        self.logger.info(f'gasp: {gasp}')
+        # gasp = requests.get(self.gas_api).json()['result']['SafeGasPrice']
+        # self.logger.info(f'gasp: {gasp}')
 
         if pendNonce > nonce and self.wait_count < 3:
             self.logger.info(f'There are pending transactions [{pendNonce}, {nonce}] ... waited {self.wait_count}x!')
             self.wait_count += 1
             return
 
-        if gasp > '90':
-            return
+        # if gasp > '90':
+        #     return
         
-        if self.wait_count == 0:
-            self.gasp = gasp
-        else:
-            gasp = self.gasp
+        # if self.wait_count == 0:
+        #     self.gasp = gasp
+        # else:
+        #     gasp = self.gasp
         
         balance = loop.run_in_executor(None, web3.eth.getBalance, account.address)
         gasPrice = loop.run_in_executor(None, web3.toWei, gasp, 'gwei')
